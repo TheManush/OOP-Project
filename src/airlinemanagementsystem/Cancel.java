@@ -14,7 +14,7 @@ public class Cancel extends JFrame implements ReservationAction, ActionListener 
     private JButton fetchButton, flight;
 
     public Cancel() {
-        getContentPane().setBackground(new Color(173, 216, 230));
+        getContentPane().setBackground(Color.WHITE);
         setLayout(null);
         setLocationRelativeTo(null);
         setResizable(false);
