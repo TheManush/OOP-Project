@@ -195,47 +195,54 @@ public class BoardingPass extends JFrame implements ReservationAction, ActionLis
 
     
     private void printWindowAsPDF() {
-        try {
-            String pnr = tfpnr.getText().trim();
-            if (pnr.isEmpty()) {
-                JOptionPane.showMessageDialog(this, "PNR cannot be empty. Please enter a valid PNR.");
-                return;
-            }
-
-            JFileChooser fileChooser = new JFileChooser();
-            fileChooser.setDialogTitle("Save Boarding Pass");
-            fileChooser.setSelectedFile(new java.io.File("BoardingPass_" + pnr + ".pdf"));
-
-            int userSelection = fileChooser.showSaveDialog(this);
-            if (userSelection != JFileChooser.APPROVE_OPTION) {
-                return;
-            }
-
-            java.io.File fileToSave = fileChooser.getSelectedFile();
-            String filePath = fileToSave.getAbsolutePath();
-
-            if (!filePath.endsWith(".pdf")) {
-                filePath += ".pdf";
-            }
-
-            BufferedImage image = new Robot().createScreenCapture(this.getBounds());
-
-            Document document = new Document();
-            PdfWriter.getInstance(document, new FileOutputStream(filePath));
-            document.open();
-
-            Image pdfImage = Image.getInstance(image, null);
-            pdfImage.scaleToFit(document.getPageSize().getWidth(), document.getPageSize().getHeight());
-            document.add(pdfImage);
-
-            document.close();
-
-            JOptionPane.showMessageDialog(this, "Boarding pass saved as " + filePath);
-        } catch (Exception e) {
-            e.printStackTrace();
-            JOptionPane.showMessageDialog(this, "Error generating PDF: " + e.getMessage());
+    try {
+        String pnr = tfpnr.getText().trim();
+        if (pnr.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "PNR cannot be empty. Please enter a valid PNR.");
+            return;
         }
+
+        JFileChooser fileChooser = new JFileChooser();
+        fileChooser.setDialogTitle("Save Boarding Pass");
+        fileChooser.setSelectedFile(new java.io.File("BoardingPass_" + pnr + ".pdf"));
+
+        int userSelection = fileChooser.showSaveDialog(this);
+        if (userSelection != JFileChooser.APPROVE_OPTION) {
+            return;
+        }
+
+        java.io.File fileToSave = fileChooser.getSelectedFile();
+        String filePath = fileToSave.getAbsolutePath();
+
+        if (!filePath.endsWith(".pdf")) {
+            filePath += ".pdf";
+        }
+
+        // Create a BufferedImage and paint only the content panel
+        JPanel contentPanel = (JPanel) getContentPane();
+        BufferedImage image = new BufferedImage(contentPanel.getWidth(), contentPanel.getHeight(), BufferedImage.TYPE_INT_RGB);
+        Graphics2D g2d = image.createGraphics();
+        contentPanel.paint(g2d);
+        g2d.dispose();
+
+        // Convert BufferedImage to Image for PDF
+        Document document = new Document();
+        PdfWriter.getInstance(document, new FileOutputStream(filePath));
+        document.open();
+
+        Image pdfImage = Image.getInstance(image, null);
+        pdfImage.scaleToFit(document.getPageSize().getWidth(), document.getPageSize().getHeight());
+        document.add(pdfImage);
+
+        document.close();
+
+        JOptionPane.showMessageDialog(this, "Boarding pass saved as " + filePath);
+    } catch (Exception e) {
+        e.printStackTrace();
+        JOptionPane.showMessageDialog(this, "Error generating PDF: " + e.getMessage());
     }
+}
+
 
     @Override
     public void performAction() {
